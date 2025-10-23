@@ -47,7 +47,10 @@ if __name__ == '__main__':
         print('updating series data')
 
         for elt in series_items:
-            fred_pandas.load_records(series=elt, update=True)
+            try:
+                fred_pandas.load_records(series=elt, update=True)
+            except Exception as e:
+                print(f"Failed to update {elt}: {e}")
         exit()
 # ----------------------------------------------------------------------
 @st.cache_data
@@ -56,7 +59,11 @@ def setup_dataframe():
     tbl = {}
     
     for series in series_items:
-        tbl[series] = fred_pandas.load_records(series=series, update=False)
+        try:
+            tbl[series] = fred_pandas.load_records(series=series, update=False)
+        except (AttributeError, ImportError, Exception):
+            # If pickle loading fails, fetch fresh data
+            tbl[series] = fred_pandas.load_records(series=series, update=True)
 
     for series, df in tbl.items():
         df.rename(columns={'value': series}, inplace=True)
@@ -86,7 +93,11 @@ def setup_diff_dataframe():
     tbl = {}
     
     for series in series_items:
-        tbl[series] = fred_pandas.load_records(series=series, update=False)
+        try:
+            tbl[series] = fred_pandas.load_records(series=series, update=False)
+        except (AttributeError, ImportError, Exception):
+            # If pickle loading fails, fetch fresh data
+            tbl[series] = fred_pandas.load_records(series=series, update=True)
 
     for series, df in tbl.items():
         df.rename(columns={'value': series}, inplace=True)

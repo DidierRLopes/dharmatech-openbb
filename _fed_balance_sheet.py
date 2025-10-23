@@ -44,7 +44,11 @@ def load_dataframe():
     tbl = {}
     
     for series in series_items:
-        tbl[series] = fred_pandas.load_records(series=series, update=False)
+        try:
+            tbl[series] = fred_pandas.load_records(series=series, update=False)
+        except (AttributeError, ImportError, Exception):
+            # If pickle loading fails, fetch fresh data
+            tbl[series] = fred_pandas.load_records(series=series, update=True)
 
     for series, df in tbl.items():
         df.rename(columns={'value': series}, inplace=True)
@@ -70,7 +74,11 @@ def load_diff_dataframe():
     tbl = {}
     
     for series in series_items:
-        tbl[series] = fred_pandas.load_records(series=series, update=False)
+        try:
+            tbl[series] = fred_pandas.load_records(series=series, update=False)
+        except (AttributeError, ImportError, Exception):
+            # If pickle loading fails, fetch fresh data
+            tbl[series] = fred_pandas.load_records(series=series, update=True)
 
     for series, df in tbl.items():
         df.rename(columns={'value': series}, inplace=True)

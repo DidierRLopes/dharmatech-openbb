@@ -13,17 +13,25 @@ import treasury_gov_pandas.datasets.mts.mts_table_4.load
 import fed_net_liquidity
 import _fed_balance_sheet
 import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Get available dates from FRED data
-df = _fed_balance_sheet.load_diff_dataframe()
-if df is not None and not df.empty:
-    df['date'] = pd.to_datetime(df['date'])
-    df = df.set_index('date').diff().reset_index()
-    available_dates = sorted(
-        df['date'].dt.strftime('%Y-%m-%d').unique(),
-        reverse=True
-    )
-else:
+try:
+    df = _fed_balance_sheet.load_diff_dataframe()
+    if df is not None and not df.empty:
+        df['date'] = pd.to_datetime(df['date'])
+        df = df.set_index('date').diff().reset_index()
+        available_dates = sorted(
+            df['date'].dt.strftime('%Y-%m-%d').unique(),
+            reverse=True
+        )
+    else:
+        available_dates = []
+except Exception as e:
+    print(f"Warning: Could not load Fed balance sheet data: {e}")
     available_dates = []
 
 # Create options list for the widget
