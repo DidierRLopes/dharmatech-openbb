@@ -32,7 +32,7 @@ date_options = [{"label": date, "value": date} for date in available_dates]
 app = FastAPI()
 
 origins = [
-    "https://pro.openbb.co",
+    "*",
 ]
 
 app.add_middleware(
